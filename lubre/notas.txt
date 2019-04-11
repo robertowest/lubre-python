@@ -1,0 +1,24 @@
+Instalacion segura con pip en windows
+
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org <paquete>
+
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org sqlobject
+
+
+
+Creamos un nuevo repositorio para git
+
+mkdir -p /ubicacion/carpeta
+cd /ubicacion/carpeta
+
+git init
+git add .
+git commit -m "primera carga"
+git remote add origin https://github.com/robertowest/django-2.1-mysite.git
+git push -u origin master
+
+Si necesitamos borrar una carpeta
+
+git rm -r --cached .idea/
+git commit -m 'Eliminada carpeta creada por pycharm'
+git push -u origin master
