@@ -6,7 +6,8 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'myApp'
+    'myApp',
+    'contactos'
 )
 
 SECRET_KEY = 'b&^=!i-&#rdx(_$q7lzcztew^3-5)v@igi%ug=)fd70m^9sb2'
