@@ -5,4 +5,4 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 from django.db import models
 from myApp.models import 
-
+from contactos.models import

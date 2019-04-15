@@ -6,6 +6,10 @@ import sys
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'standAlone.settings')
+<<<<<<< HEAD
+=======
+
+>>>>>>> e92275cc649d1f74fb894d14f86eefbb0e5da937
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
