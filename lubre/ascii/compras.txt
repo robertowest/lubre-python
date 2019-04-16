@@ -1,0 +1,25 @@
+Fecha Comprobante,1,8,8,2
+Tipo Comprobante,9,11,3,2
+Punto de Venta,12,16,5,2
+Nro. Comprobante,17,36,20,2
+Despacho Importación,37,52,16,3
+Cód. Doc. Vendedor,53,54,2,2
+Nro. Ident. Vendedor,55,74,20,3
+Apellido y Nombre Vendedor,75,104,30,3
+Total,105,119,15,2
+No Grabado,120,134,15,2
+Exento,135,149,15,2
+IVA,150,164,15,2
+Otros Impuestos,165,179,15,2
+Percepción IIBB,180,194,15,2
+Percep. Imp. Munic.,195,209,15,2
+Imp. Internos,210,224,15,2
+Moneda,225,227,3,3
+Tipo Cambio,228,237,10,2
+Cant. Alicuotas,238,238,1,2
+Cod. Operación,239,239,1,1
+Credito Fiscal,240,254,15,2
+Otros Tributos,255,269,15,2
+CUIT Emisor,270,280,11,2
+Nombre Emisor,281,310,30,3
+Comisión IVA,311,325,15,2

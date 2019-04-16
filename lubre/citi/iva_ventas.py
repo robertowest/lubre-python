@@ -32,13 +32,9 @@ inicioMes = datetime(prev.year, prev.month, 1)
 finMes = datetime(prev.year, prev.month,
                   calendar.monthrange(prev.year, prev.month)[1])
 
-# lista para alicuotas
-alicuotas = []
-
 # apertura del archivo ascii para escritura
-nombre = '1.CITI-Ventas.txt'
-f = open(nombre, 'w')
-
+f = open('3.CITI-Ventas.txt', 'w')
+f2 = open('4.CITI-Ventas-Alicuotas.txt', 'w')
 
 class Error(Exception):
     """Clase base para excepciones en el módulo."""
@@ -115,119 +111,79 @@ def validar_total(valor):
     return valor
 
 
-def cantidad_alicuotas(*args):
-    contador = 0
-    for arg in args:
-        if validar_importe(arg) != 0:
-            contador = contador + 1
-    return contador
+def validar_operacion(valor1, valor2):
+    if valor1 == valor2:
+        return 'N'
+    else:
+        return '0'
 
 
-def recalcular_compra(reg):
-    neto21 = validar_importe(reg['IVA21']) / (21 / 100)
-    neto10 = validar_importe(reg['IVA10_5']) / (10.5 / 100)
-    neto27 = validar_importe(reg['IVA27']) / (27 / 100)
+def validar_neto_gravado(gravado, no_gravado):
+    if gravado == no_gravado:
+        return validar_total(gravado)
+    else:
+        return validar_total('0')
 
-    grabado = neto21 + neto10 + neto27
-    no_grabado = validar_importe(reg['GRAVADO']) - grabado
 
-    reg['GRABADO'] = format(grabado, '.2f').replace(".", ",")
-    reg['NOGRAVADO'] = format(no_grabado, '.2f').replace(".", ",")
+def validar_alicuota_iva(iva, otro):
+    iva = validar_importe(iva)
+    otro = validar_importe(otro)
+    if iva != 0:
+        return '3'
+    elif otro != 0:
+        return '4'
+    else:
+        return '5'
+
+
+def validar_iva(iva, otro):
+    iva = validar_importe(iva)
+    otro = validar_importe(otro)
+    if iva != 0:
+        return validar_total(iva)
+    elif otro != 0:
+        return validar_total(otro)
+    else:
+        return validar_total(0)
 
 
 def imprimir_linea(reg):
-    # comprobamos si existen más de una alícuota de IVA en la línea
-    if cantidad_alicuotas(reg['IVA21'], reg['IVA10_5'], reg['IVA27']) > 1:
-        recalcular_compra(reg)
-
     f.write(validar_fecha(reg['FECHA']) +
             validar_comprobante(reg['TIPOCOMPROB'] + reg['LETRA']) +
             reg['TERMINAL'].rjust(5, '0') +
             reg['NUMERO'].rjust(20, '0') +
-            ''.rjust(16, ' ') +
+            reg['NUMERO'].rjust(20, '0') +
             '80' +
             reg['CUIT'].replace('-', '').rjust(20, '0') +
-            reg['RAZON'][0:30].ljust(30, ' ') +
+            reg['NOMBRE'][0:30].ljust(30, ' ') +
             validar_total(reg['TOTAL']) +
-            validar_total(reg['NOGRAVADO']) +
-            '0'.rjust(15, '0') +
-            validar_total(reg['PERC_IB']) +
-            '0'.rjust(15, '0') +
-            validar_total(reg['PERC_IVA']) +
+            validar_total(reg['NOGRAVA']) +
             '0'.rjust(15, '0') +
             '0'.rjust(15, '0') +
+            validar_total(reg['PERCIVA']) +
+            '0'.rjust(15, '0') +
+            '0'.rjust(15, '0') +
+            validar_total(reg['IMPINT']) +
             'PES' +
             '0001000000' +
-            str(cantidad_alicuotas(reg['IVA21'],
-                                   reg['IVA10_5'],
-                                   reg['IVA27'])) +
-            '0' +
+            '1' +
+            validar_operacion(reg['NOGRAVA'], reg['TOTAL']) +
             '0'.rjust(15, '0') +
-            '0'.rjust(15, '0') +
-            '0'.rjust(11, '0') +
-            ' '.ljust(30, ' ') +
-            '0'.rjust(15, '0'))
-    recalcular_alicuota(reg)
+            validar_fecha(reg['FECHA'])
+    )
 
 
-def recalcular_alicuota(reg):
-    # creamos una lista para cada alicuota
-    iva21 = {'Comprobante': validar_comprobante(reg['TIPOCOMPROB'] + reg['LETRA']),
-             'Terminal': reg['TERMINAL'].rjust(5, '0'),
-             'Numero': reg['NUMERO'].rjust(20, '0'),
-             'Documento': '80',
-             'CUIT': reg['CUIT'].replace('-', '').rjust(20, '0'),
-             'Neto': validar_total(validar_importe(reg['IVA21']) / (21 / 100)),
-             'Alicuota': '0005',
-             'Iva': validar_total(reg['IVA21'])}
-
-    iva10 = {'Comprobante': iva21['Comprobante'],
-             'Terminal': iva21['Terminal'],
-             'Numero': iva21['Numero'],
-             'Documento': iva21['Documento'],
-             'CUIT': iva21['CUIT'],
-             'Neto': validar_total(validar_importe(reg['IVA10_5']) / (10.5 / 100)),
-             'Alicuota': '0004',
-             'Iva': validar_total(reg['IVA10_5'])}
-
-    iva27 = {'Comprobante': iva21['Comprobante'],
-             'Terminal': iva21['Terminal'],
-             'Numero': iva21['Numero'],
-             'Documento': iva21['Documento'],
-             'CUIT': iva21['CUIT'],
-             'Neto': validar_total(validar_importe(reg['IVA27']) / (27 / 100)),
-             'Alicuota': '0003',
-             'Iva': validar_total(reg['IVA27'])}
-
-    # agregamos los nuevos elementos
-    if validar_importe(iva21['Iva']) != 0:
-        alicuotas.append(iva21)
-    if validar_importe(iva10['Iva']) != 0:
-        alicuotas.append(iva10)
-    if validar_importe(iva27['Iva']) != 0:
-        alicuotas.append(iva27)
-
-    
-
-def imprimir_alicuotas():
-    f = open('1.CITI-Compras-Alicuotas.txt', 'w')
-
-    for (contador, reg) in enumerate(alicuotas):
-        if contador > 0:
-            f.write('\n')
-        f.write(reg['Comprobante'] +
-                reg['Terminal'] +
-                reg['Numero'] +
-                reg['Documento'] +
-                reg['CUIT'] +
-                reg['Neto'] +
-                reg['Alicuota'] +
-                reg['Iva'])
-    f.close()
-
+def imprimir_linea_alicuota(reg):
+    f2.write(validar_comprobante(reg['TIPOCOMPROB'] + reg['LETRA']) +
+             reg['TERMINAL'].rjust(5, '0') +
+             reg['NUMERO'].rjust(20, '0') +
+             validar_neto_gravado(reg['GRAVADO'], reg['NOGRAVA']) + 
+             validar_alicuota_iva(reg['IVA21'], reg['OTROIVA']) + 
+             validar_iva(reg['IVA21'], reg['OTROIVA'])
+    )
 
 def lubre():
-    with open('citi-compras.csv') as csvarchivo:
+    with open('citi-ventas.csv') as csvarchivo:
         entrada = csv.DictReader(csvarchivo,
                                  delimiter=';',
                                  quoting=csv.QUOTE_NONE)
@@ -237,24 +193,21 @@ def lubre():
                     # salto de línea en el archivo
                     # lo hago aquí para evitar el último salto de línea
                     f.write('\n')
+                    f2.write('\n')
                 imprimir_linea(reg)
-                recalcular_alicuota(reg)
+                imprimir_linea_alicuota(reg)
             except BaseException:
                 print('Error al procesar linea número ', contador + 2)
                 raise
-        
-        imprimir_alicuotas()
-
-def debo():
-    pass
 
 
 if __name__ == "__main__":
     try:
         limpiar()
         lubre()
-        print('Archivo {} creado correctamente.'.format(nombre))
+        print('Archivo {} creado correctamente.'.format('3.CITI-Ventas y 4.CITI-Ventas-Alicuotas'))
     except ErrorRangoFecha as err:
         print('La fecha {} no pertenece al rango {}-{}'.format(err.fecha, err.inicio, err.fin))
     finally:
         f.close()
+        f2.close()

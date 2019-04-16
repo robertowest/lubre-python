@@ -210,7 +210,7 @@ def recalcular_alicuota(reg):
     
 
 def imprimir_alicuotas():
-    f = open('1.CITI-Compras-Alicuotas.txt', 'w')
+    f = open('2.CITI-Compras-Alicuotas.txt', 'w')
 
     for (contador, reg) in enumerate(alicuotas):
         if contador > 0:
